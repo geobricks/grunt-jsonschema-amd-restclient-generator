@@ -1,0 +1,42 @@
+{
+  "name": "grunt-jsonschema-amd-restclient-generator",
+  "description": "Generate an AMD client for REST web services described by a JSON Schema.",
+  "version": "0.1.0",
+  "homepage": "https://github.com/geobricks/grunt-jsonschema-amd-restclient-generator",
+  "author": {
+    "name": "Guido Barbaglia",
+    "email": "guido.barbaglia@gmail.com",
+    "url": "https://kalimadev.wordpress.com/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/geobricks/grunt-jsonschema-amd-restclient-generator"
+  },
+  "bugs": {
+    "url": "https://github.com/geobricks/grunt-jsonschema-amd-restclient-generator/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/geobricks/grunt-jsonschema-amd-restclient-generator/blob/master/LICENSE-MIT"
+    }
+  ],
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "devDependencies": {
+    "grunt-contrib-jshint": "^0.9.2",
+    "grunt-contrib-clean": "^0.5.0",
+    "grunt-contrib-nodeunit": "^0.3.3",
+    "grunt": "~0.4.5"
+  },
+  "peerDependencies": {
+    "grunt": "~0.4.5"
+  },
+  "keywords": [
+    "gruntplugin"
+  ]
+}
