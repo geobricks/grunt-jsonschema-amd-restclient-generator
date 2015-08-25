@@ -25,65 +25,56 @@ In your project's Gruntfile, add a section named `jsonschema_amd_restclient_gene
 ```js
 grunt.initConfig({
   jsonschema_amd_restclient_generator: {
-    options: {
-      // Task-specific options go here.
-    },
-    your_target: {
-      // Target-specific file lists and/or options go here.
-    },
-  },
+    custom_options: {
+      /* Task-specific options go here. */
+    }
+  }
 });
 ```
 
 ### Options
 
-#### options.separator
+#### options.base_url
 Type: `String`
-Default value: `',  '`
 
-A string value that is used to do something with whatever.
+The URI of the JSON Schema.
 
-#### options.punctuation
+#### options.output_name
 Type: `String`
-Default value: `'.'`
 
-A string value that is used to do something else with whatever else.
+The name of the final AMD library.
 
 ### Usage Examples
 
-#### Default Options
-In this example, the default options are used to do something with whatever. So if the `testing` file has the content `Testing` and the `123` file had the content `1 2 3`, the generated result would be `Testing, 1 2 3.`
-
-```js
-grunt.initConfig({
-  jsonschema_amd_restclient_generator: {
-    options: {},
-    files: {
-      'dest/default_options': ['src/testing', 'src/123'],
-    },
-  },
-});
-```
-
 #### Custom Options
-In this example, custom options are used to do something else with whatever else. So if the `testing` file has the content `Testing` and the `123` file had the content `1 2 3`, the generated result in this case would be `Testing: 1 2 3 !!!`
+This is an example of the use of the plugin to generate the AMD client for FAOSTAT APIs. The final reslt, 
+`FAOSTATClient.min.js`, will be available in the `dist` folder. 
 
 ```js
-grunt.initConfig({
-  jsonschema_amd_restclient_generator: {
-    options: {
-      separator: ': ',
-      punctuation: ' !!!',
-    },
-    files: {
-      'dest/default_options': ['src/testing', 'src/123'],
-    },
-  },
-});
+'use strict';
+
+module.exports = function (grunt) {
+
+    /* Project configuration. */
+    grunt.initConfig({
+
+        /* Plugin configuration. */
+        jsonschema_amd_restclient_generator: {
+            custom_options: {
+                options: {
+                    base_url: 'http://localhost:8080/faostat-api/v1.0/',
+                    output_name: 'test-client'
+                }
+            }
+        }
+
+    });
+
+    /* Load NPM tasks. */
+    grunt.loadNpmTasks('grunt-jsonschema-amd-restclient-generator');
+
+    /* Register task. */
+    grunt.registerTask('default', ['jsonschema_amd_restclient_generator']);
+
+};
 ```
-
-## Contributing
-In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
-
-## Release History
-_(Nothing yet)_
