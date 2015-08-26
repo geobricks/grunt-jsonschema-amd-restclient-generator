@@ -6,156 +6,233 @@
  * Licensed under the MIT license.
  */
 
-'use strict';
+(function () {
 
-module.exports = function (grunt) {
+    'use strict';
 
-    grunt.registerMultiTask('jsonschema_amd_restclient_generator', function() {
+    /*global module*/
+    module.exports = function (grunt) {
 
-        /* Merge options. */
-        var options = this.options({});
+        /* Declare variables. */
+        var inject_params,
+            final_url,
+            i,
+            z,
+            start,
+            end,
+            param,
+            get_path_parameters,
+            out,
+            create_methods;
 
-        /* Make the options global. */
-        grunt.option('base_url', options.base_url);
-        grunt.option('output_name', options.output_name);
-
-        /* Configure Curl and download the JSON Schema. */
-        grunt.initConfig({
-            curl: {
-                'resources/json/schema.json': options.base_url
-            }
-        });
-        grunt.loadNpmTasks('grunt-curl');
-        grunt.task.run('curl');
-
-        /* Specify the next task to run. */
-        grunt.task.run('generate_client');
-
-    });
-
-    /* Register task. */
-    grunt.registerTask('generate_client', 'Generate an AMD client for REST web services described by a JSON Schema.', function () {
-
-        /* Merge options. */
-        var options = this.options({});
-
-        /* Load required libraries. */
-        var Handlebars = require('handlebars');
-        var $ = require('jquery');
-
-        /* Load JSON Schema. */
-        var schema = grunt.file.readJSON('resources/json/schema.json');
-
-        /* For each link in links -> create method. */
-        var methods = [];
-        var method_source = grunt.file.read('src/html/method.hbs', [, {encoding: 'utf8'}]);
-        var method_template = Handlebars.compile(method_source);
-        for (var i = 0 ; i < schema.links.length ; i++) {
-
-            /* Store current service description. */
-            var l = schema.links[i];
-
-            /* Generate method signature. */
-            var parameters = '';
-            for (var j = 0 ; j < Object.keys(l.schema.properties).length ; j++) {
-                parameters += Object.keys(l.schema.properties)[j];
-                if (j < Object.keys(l.schema.properties).length - 1)
-                    parameters += ', ';
-            }
-
-            /* Generate query parameters object. */
-            var path_parameters = get_path_parameters(l.href);
-            var data = [];
-            for (j = 0 ; j < Object.keys(l.schema.properties).length ; j++) {
-                var o = Object.keys(l.schema.properties)[j];
-                if (path_parameters.indexOf(Object.keys(l.schema.properties)[j]) < 0) {
-                    data.push(o);
+        /* Inject parameters in the URL. */
+        inject_params = function (base_url, href) {
+            final_url = base_url + href;
+            for (i = 0; i < href.length; i += 1) {
+                start = null;
+                end = null;
+                if (href.charAt(i) === '{') {
+                    start = i;
+                }
+                if (href.charAt(i) === '}') {
+                    end = i;
+                }
+                if (start !== null && end !== null) {
+                    param = href.substring(1 + start, end);
+                    final_url = final_url.replace(href.substring(start, 1 + end), '\' + ' + param + ' + \'');
+                    start = null;
+                    end = null;
                 }
             }
-            var data_source = grunt.file.read('src/html/data.hbs', [, {
+            return final_url;
+        };
+
+        /* Get the list of path parameters, if any. */
+        get_path_parameters = function (href) {
+            out = [];
+            start = null;
+            end = null;
+            for (z = 0; z < href.length; z += 1) {
+                if (href.charAt(z) === '{') {
+                    start = z;
+                }
+                if (href.charAt(z) === '}') {
+                    end = z;
+                }
+                if (start !== null && end !== null) {
+                    out.push(href.substring(1 + start, end));
+                    start = null;
+                    end = null;
+                }
+            }
+            return out;
+        };
+
+        create_methods = function (schema) {
+
+            var method_source,
+                method_template,
+                l,
+                j,
+                o,
+                parameters,
+                path_parameters,
+                data,
+                data_source,
+                data_template,
+                data_dynamic_data,
+                method_dynamic_data,
+                data_html,
+                methods,
+                Handlebars;
+
+            /* Load Handlebars. */
+            /*global require*/
+            Handlebars = require('handlebars');
+
+            /* Create one method for each link contained in the JSON Schema. */
+            methods = [];
+            method_source = grunt.file.read('src/html/method.hbs', [null, {encoding: 'utf8'}]);
+            method_template = Handlebars.compile(method_source);
+            for (i = 0; i < schema.links.length; i += 1) {
+
+                /* Store current service description. */
+                l = schema.links[i];
+
+                /* Generate method signature. */
+                parameters = '';
+                /** @namespace l.schema */
+                /** @namespace l.schema.properties */
+                for (j = 0; j < Object.keys(l.schema.properties).length; j += 1) {
+                    parameters += Object.keys(l.schema.properties)[j];
+                    if (j < Object.keys(l.schema.properties).length - 1) {
+                        parameters += ', ';
+                    }
+                }
+
+                /* Generate query parameters object. */
+                path_parameters = get_path_parameters(l.href);
+                data = [];
+                for (j = 0; j < Object.keys(l.schema.properties).length; j += 1) {
+                    o = Object.keys(l.schema.properties)[j];
+                    if (path_parameters.indexOf(Object.keys(l.schema.properties)[j]) < 0) {
+                        data.push(o);
+                    }
+                }
+                data_source = grunt.file.read('src/html/data.hbs', [null, {
+                    encoding: 'utf8'
+                }]);
+                data_template = Handlebars.compile(data_source);
+                data_dynamic_data = {
+                    data: data
+                };
+                data_html = data_template(data_dynamic_data);
+
+                /* Generate the method. */
+                method_dynamic_data = {
+                    /** @namespace schema.definitions */
+                    url: '\'' + inject_params(grunt.option('base_url'), l.href, l.schema.properties, schema.definitions) + '\'',
+                    method: '\'' + l.method.toString().toUpperCase() + '\'',
+                    rel: l.rel,
+                    parameters: parameters,
+                    data: data_html
+                };
+                methods.push(method_template(method_dynamic_data));
+
+            }
+
+        };
+
+        /* Plugin entry point. */
+        grunt.registerMultiTask('jsonschema_amd_restclient_generator', function () {
+
+            /* Merge options. */
+            var options = this.options({});
+
+            /* Make the options global. */
+            grunt.option('base_url', options.base_url);
+            grunt.option('output_name', options.output_name);
+
+            /* Specify the next task to run. */
+            grunt.task.run('fetch_json_schema');
+
+        });
+
+        /* Curl task. */
+        grunt.registerTask('fetch_json_schema', 'Fetch JSON Schema from remote URL and store it in a local file.', function () {
+
+            /* Configure Curl and download the JSON Schema. */
+            grunt.initConfig({
+                curl: {
+                    'resources/json/schema.json': grunt.option('base_url')
+                }
+            });
+            grunt.loadNpmTasks('grunt-curl');
+            grunt.task.run('curl');
+
+            /* Specify the next task to run. */
+            grunt.task.run('generate_client');
+
+        });
+
+        /* Register task. */
+        grunt.registerTask('generate_client', 'Generate an AMD client for REST web services described by a JSON Schema.', function () {
+
+            /* Load required libraries. */
+            var Handlebars,
+                schema,
+                methods,
+                source,
+                template,
+                dynamic_data,
+                html;
+
+            /* Load Handlebars. */
+            /*global require*/
+            Handlebars = require('handlebars');
+
+            /* Load JSON Schema into an object. */
+            schema = grunt.file.readJSON('resources/json/schema.json');
+
+            /* For each link in links -> create method. */
+            methods = create_methods(schema);
+
+            /* Load Handlebars template for tiles. */
+            source = grunt.file.read('src/html/archetype.hbs', [null, {
                 encoding: 'utf8'
             }]);
-            var data_template = Handlebars.compile(data_source);
-            var data_dynamic_data = {
-                data: data
+            template = Handlebars.compile(source);
+            dynamic_data = {
+                methods: methods,
+                validators: 'validators'
             };
-            var data_html = data_template(data_dynamic_data);
+            html = template(dynamic_data);
 
-            /* Generate the method. */
-            var method_dynamic_data = {
-                url: '\'' + inject_params(grunt.option('base_url'), l.href, l.schema.properties, schema.definitions) + '\'',
-                method: '\'' + l.method.toString().toUpperCase() + '\'',
-                rel: l.rel,
-                parameters: parameters,
-                data: data_html
-            };
-            methods.push(method_template(method_dynamic_data));
+            /* Write the file. */
+            grunt.file.write('tmp/' + grunt.option('output_name') + '.js', html, [null, {encoding: 'utf8'}]);
 
-        }
 
-        /* Load Handlebars template for tiles. */
-        var source = grunt.file.read('src/html/archetype.hbs', [, {
-            encoding: 'utf8'
-        }]);
-        var template = Handlebars.compile(source);
-        var dynamic_data = {
-            methods: methods,
-            validators: 'validators'
-        };
-        var html = template(dynamic_data);
+            /* Specify the next task to run. */
+            grunt.task.run('minify_client');
 
-        /* Write the file. */
-        grunt.file.write('tmp/' + grunt.option('output_name') + '.js', template(dynamic_data), [, {encoding: 'utf8'}]);
-
-        /* Specify the next task to run. */
-        grunt.task.run('minify_client');
-
-    });
-
-    grunt.registerTask('minify_client', 'Generate an AMD client for REST web services described by a JSON Schema.', function () {
-        var dist = 'dist/' + grunt.option('output_name') + '.min.js';
-        var uglify = {};
-        uglify.target = {};
-        uglify.target.files = {};
-        uglify.target.files['dist/' + grunt.option('output_name') + '.min.js'] = ['tmp/' + grunt.option('output_name') + '.js'];
-        grunt.initConfig({
-            uglify: uglify
         });
-        grunt.loadNpmTasks('grunt-contrib-uglify');
-        grunt.task.run('uglify');
-    });
 
-    /* Inject parameters in the URL. */
-    var inject_params = function(base_url, href, properties, definitions) {
-        var final_url = base_url + href;
-        for (var i = 0 ; i < href.length ; i++) {
-            var start, end = null;
-            if (href.charAt(i) == '{') start = i;
-            if (href.charAt(i) == '}') end   = i;
-            if (start != null && end != null) {
-                var param = href.substring(1 + start, end);
-                final_url = final_url.replace(href.substring(start, 1 + end), '\' + ' + param + ' + \'');
-                start = null;
-                end = null;
-            }
-        }
-        return final_url;
+        grunt.registerTask('minify_client', 'Generate an AMD client for REST web services described by a JSON Schema.', function () {
+            var dist,
+                uglify;
+            dist = 'dist/' + grunt.option('output_name') + '.min.js';
+            uglify = {};
+            uglify.target = {};
+            uglify.target.files = {};
+            uglify.target.files[dist] = ['tmp/' + grunt.option('output_name') + '.js'];
+            /** @namespace grunt.initConfig */
+            grunt.initConfig({
+                uglify: uglify
+            });
+            grunt.loadNpmTasks('grunt-contrib-uglify');
+            grunt.task.run('uglify');
+        });
+
     };
 
-    /* Get the list of path parameters, if any. */
-    var get_path_parameters = function(href) {
-        var out = [];
-        for (var i = 0 ; i < href.length ; i++) {
-            var start, end = null;
-            if (href.charAt(i) == '{') start = i;
-            if (href.charAt(i) == '}') end = i;
-            if (start != null && end != null) {
-                out.push(href.substring(1 + start, end));
-                start = null;
-                end = null;
-            }
-        }
-        return out;
-    }
-
-};
+}());
