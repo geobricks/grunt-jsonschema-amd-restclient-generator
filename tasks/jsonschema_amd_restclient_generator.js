@@ -49,7 +49,7 @@
                 }
                 if (start !== null && end !== null) {
                     param = href.substring(1 + start, end);
-                    final_url = final_url.replace(href.substring(start, 1 + end), '\' + ' + param + ' + \'');
+                    final_url = final_url.replace(href.substring(start, 1 + end), '\' + ' + 'config.' + param + ' + \'');
                     start = null;
                     end = null;
                 }
@@ -110,15 +110,15 @@
                 l = schema.links[i];
 
                 /* Generate method signature. */
-                parameters = '';
-                /** @namespace l.schema */
-                /** @namespace l.schema.properties */
-                for (j = 0; j < Object.keys(l.schema.properties).length; j += 1) {
-                    parameters += Object.keys(l.schema.properties)[j];
-                    if (j < Object.keys(l.schema.properties).length - 1) {
-                        parameters += ', ';
-                    }
-                }
+                //parameters = '';
+                ///** @namespace l.schema */
+                ///** @namespace l.schema.properties */
+                //for (j = 0; j < Object.keys(l.schema.properties).length; j += 1) {
+                //    parameters += Object.keys(l.schema.properties)[j];
+                //    if (j < Object.keys(l.schema.properties).length - 1) {
+                //        parameters += ', ';
+                //    }
+                //}
 
                 /* Generate query parameters object. */
                 path_parameters = get_path_parameters(l.href);

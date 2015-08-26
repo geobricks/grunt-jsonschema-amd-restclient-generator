@@ -1,11 +1,11 @@
-{{module_name}}.prototype.{{rel}} = function({{parameters}}, success, error) {
+{{module_name}}.prototype.{{rel}} = function(config) {
     if (this.isValidRequest()) {
         $.ajax({
             url: {{{url}}},
             data: {{{data}}},
             type: {{{method}}},
-            success: success,
-            error: error
+            success: config.success,
+            error: config.error
         });
     } else {
         throw 400;
