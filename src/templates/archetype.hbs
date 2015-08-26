@@ -3,14 +3,17 @@ define(['jquery'], function ($) {
 
     'use strict';
 
-    function {{module_name}}(api_key, client_key) {
+    function {{module_name}}(config) {
 
         /* Store configuration. */
         this.CONFIG = {
-            api_key: api_key,
-            client_key: client_key,
+            api_key: config.api_key,
+            client_key: config.client_key,
             base_url: {{{base_url}}}
         };
+
+        /* Extend default configuration. */
+        this.CONFIG = $.extend(true, {}, this.CONFIG, config);
 
     }
 
