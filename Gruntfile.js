@@ -18,7 +18,7 @@ module.exports = function (grunt) {
             custom_options: {
                 options: {
                     base_url: 'http://localhost:8080/faostat-api/v1.0/',
-                    output_name: 'test-client'
+                    output_name: 'MyClient'
                 }
             }
         }

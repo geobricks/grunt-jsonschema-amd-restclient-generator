@@ -18,25 +18,34 @@
             final_url,
             i,
             z,
+            q,
             start,
             end,
             param,
             get_path_parameters,
             out,
             create_methods,
-            module_name;
+            module_name,
+            sanitize_module_name;
+
+        /* Sanitize module name. */
+        sanitize_module_name = function () {
+            module_name = grunt.option('output_name');
+            module_name = module_name.replace(/-/g, '');
+            return module_name;
+        };
 
         /* Inject parameters in the URL. */
         inject_params = function (base_url, href) {
             final_url = base_url + href;
-            for (i = 0; i < href.length; i += 1) {
-                start = null;
-                end = null;
-                if (href.charAt(i) === '{') {
-                    start = i;
+            start = null;
+            end = null;
+            for (q = 0; q < href.length; q += 1) {
+                if (href.charAt(q) === '{') {
+                    start = q;
                 }
-                if (href.charAt(i) === '}') {
-                    end = i;
+                if (href.charAt(q) === '}') {
+                    end = q;
                 }
                 if (start !== null && end !== null) {
                     param = href.substring(1 + start, end);
@@ -136,11 +145,15 @@
                     method: '\'' + l.method.toString().toUpperCase() + '\'',
                     rel: l.rel,
                     parameters: parameters,
-                    data: data_html
+                    data: data_html,
+                    module_name: sanitize_module_name()
                 };
                 methods.push(method_template(method_dynamic_data));
 
             }
+
+            /* Return compiled template. */
+            return methods;
 
         };
 
@@ -198,10 +211,6 @@
             /* For each link in links -> create method. */
             methods = create_methods(schema);
 
-            /* Sanitize module's name. */
-            module_name = grunt.option('output_name');
-            module_name = module_name.replace(/-/g, '');
-
             /* Load Handlebars template for tiles. */
             source = grunt.file.read('src/templates/archetype.hbs', [null, {
                 encoding: 'utf8'
@@ -210,7 +219,8 @@
             dynamic_data = {
                 methods: methods,
                 validators: 'validators',
-                module_name: module_name
+                module_name: sanitize_module_name,
+                base_url: '\'' + grunt.option('base_url') + '\''
             };
             html = template(dynamic_data);
 
