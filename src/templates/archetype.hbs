@@ -1,8 +1,9 @@
+/*global define*/
 define(['jquery'], function ($) {
 
     'use strict';
 
-    function FAOSTATAPIClient(api_key, client_key) {
+    function {{module_name}}(api_key, client_key) {
 
         /* Store configuration. */
         this.CONFIG = {
@@ -16,10 +17,10 @@ define(['jquery'], function ($) {
         {{{this}}}
     {{/each}}
 
-    FAOSTATAPIClient.prototype.isValidRequest = function() {
+    {{module_name}}.prototype.isValidRequest = function() {
         return true;
     };
 
-    return FAOSTATAPIClient;
+    return {{module_name}};
 
 });

@@ -23,7 +23,8 @@
             param,
             get_path_parameters,
             out,
-            create_methods;
+            create_methods,
+            module_name;
 
         /* Inject parameters in the URL. */
         inject_params = function (base_url, href) {
@@ -92,7 +93,7 @@
 
             /* Create one method for each link contained in the JSON Schema. */
             methods = [];
-            method_source = grunt.file.read('src/html/method.hbs', [null, {encoding: 'utf8'}]);
+            method_source = grunt.file.read('src/templates/method.hbs', [null, {encoding: 'utf8'}]);
             method_template = Handlebars.compile(method_source);
             for (i = 0; i < schema.links.length; i += 1) {
 
@@ -119,7 +120,7 @@
                         data.push(o);
                     }
                 }
-                data_source = grunt.file.read('src/html/data.hbs', [null, {
+                data_source = grunt.file.read('src/templates/data.hbs', [null, {
                     encoding: 'utf8'
                 }]);
                 data_template = Handlebars.compile(data_source);
@@ -197,19 +198,24 @@
             /* For each link in links -> create method. */
             methods = create_methods(schema);
 
+            /* Sanitize module's name. */
+            module_name = grunt.option('output_name');
+            module_name = module_name.replace(/-/g, '');
+
             /* Load Handlebars template for tiles. */
-            source = grunt.file.read('src/html/archetype.hbs', [null, {
+            source = grunt.file.read('src/templates/archetype.hbs', [null, {
                 encoding: 'utf8'
             }]);
             template = Handlebars.compile(source);
             dynamic_data = {
                 methods: methods,
-                validators: 'validators'
+                validators: 'validators',
+                module_name: module_name
             };
             html = template(dynamic_data);
 
             /* Write the file. */
-            grunt.file.write('tmp/' + grunt.option('output_name') + '.js', html, [null, {encoding: 'utf8'}]);
+            grunt.file.write('dist/' + grunt.option('output_name') + '.js', html, [null, {encoding: 'utf8'}]);
 
 
             /* Specify the next task to run. */
@@ -224,7 +230,7 @@
             uglify = {};
             uglify.target = {};
             uglify.target.files = {};
-            uglify.target.files[dist] = ['tmp/' + grunt.option('output_name') + '.js'];
+            uglify.target.files[dist] = ['dist/' + grunt.option('output_name') + '.js'];
             /** @namespace grunt.initConfig */
             grunt.initConfig({
                 uglify: uglify
