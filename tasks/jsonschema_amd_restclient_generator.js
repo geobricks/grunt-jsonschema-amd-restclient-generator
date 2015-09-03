@@ -102,7 +102,7 @@
 
             /* Create one method for each link contained in the JSON Schema. */
             methods = [];
-            method_source = grunt.file.read('src/templates/method.hbs', [null, {encoding: 'utf8'}]);
+            method_source = grunt.file.read(__dirname + '/../src/templates/method.hbs', [null, {encoding: 'utf8'}]);
             method_template = Handlebars.compile(method_source);
             for (i = 0; i < schema.links.length; i += 1) {
 
@@ -129,7 +129,7 @@
                         data.push(o);
                     }
                 }
-                data_source = grunt.file.read('src/templates/data.hbs', [null, {
+                data_source = grunt.file.read(__dirname + '/../src/templates/data.hbs', [null, {
                     encoding: 'utf8'
                 }]);
                 data_template = Handlebars.compile(data_source);
@@ -159,6 +159,8 @@
 
         /* Plugin entry point. */
         grunt.registerMultiTask('jsonschema_amd_restclient_generator', function () {
+
+            grunt.log.writeln(__dirname);
 
             /* Merge options. */
             var options = this.options({});
@@ -212,7 +214,7 @@
             methods = create_methods(schema);
 
             /* Load Handlebars template for tiles. */
-            source = grunt.file.read('src/templates/archetype.hbs', [null, {
+            source = grunt.file.read(__dirname + '/../src/templates/archetype.hbs', [null, {
                 encoding: 'utf8'
             }]);
             template = Handlebars.compile(source);
