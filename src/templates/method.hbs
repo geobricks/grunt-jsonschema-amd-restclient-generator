@@ -5,7 +5,9 @@
             data: {{{data}}},
             type: {{{method}}},
             success: config.success,
-            error: config.error
+            error: config.error,
+            context: config.context,
+            always: config.always
         });
     } else {
         throw 400;
