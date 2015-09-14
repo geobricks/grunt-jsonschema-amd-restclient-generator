@@ -6,29 +6,34 @@
  * Licensed under the MIT license.
  */
 
-'use strict';
+(function () {
 
-module.exports = function (grunt) {
+    'use strict';
 
-    /* Project configuration. */
-    grunt.initConfig({
+    /*global module*/
+    module.exports = function (grunt) {
 
-        /* Plugin configuration. */
-        jsonschema_amd_restclient_generator: {
-            custom_options: {
-                options: {
-                    base_url: 'http://fenixapps2.fao.org/api/v1.0/',
-                    output_name: 'PluginTest'
+        /* Project configuration. */
+        grunt.initConfig({
+
+            /* Plugin configuration. */
+            jsonschema_amd_restclient_generator: {
+                custom_options: {
+                    options: {
+                        base_url: 'http://fenixapps2.fao.org/api/v1.0/',
+                        output_name: 'FAOSTATAPIClient'
+                    }
                 }
             }
-        }
 
-    });
+        });
 
-    /* Actually load this plugin's task(s). */
-    grunt.loadTasks('tasks');
+        /* Actually load this plugin's task(s). */
+        grunt.loadTasks('tasks');
 
-    /* Test task. */
-    grunt.registerTask('default', ['jsonschema_amd_restclient_generator']);
+        /* Test task. */
+        grunt.registerTask('default', ['jsonschema_amd_restclient_generator']);
 
-};
+    };
+
+}());
