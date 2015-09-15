@@ -1,5 +1,6 @@
 {{module_name}}.prototype.{{rel}} = function(config) {
-    if (this.isValidRequest()) {
+    config = this.apply_{{rel}}_defaults(config);
+    if (this.is_valid_{{rel}}(config)) {
         $.ajax({
             url: {{{url}}},
             data: {{{data}}},
@@ -12,4 +13,32 @@
     } else {
         throw 400;
     }
+};
+
+{{module_name}}.prototype.is_valid_{{rel}} = function(config) {
+    var parameters = [{{{parameters}}}], i;
+    for (i = 0; i < parameters.length; i += 1) {
+        if (config[parameters[i]] === undefined) {
+            throw 'Parameter "' + parameters[i] + '" is undefined. Please check your request.';
+        }
+    }
+    return true;
+};
+
+{{module_name}}.prototype.apply_{{rel}}_defaults = function (config) {
+    var i,
+        parameters = [{{{parameters}}}],
+        defaults = {
+            {{{defaults}}}
+        },
+        key;
+    for (i = 0; i < parameters.length; i += 1) {
+        key =  parameters[i];
+        try {
+            config[key] = config[key] !== undefined ? config[key] : defaults[key];
+        } catch (ignore) {
+            /* No default value available for this parameter. */
+        }
+    }
+    return config;
 };

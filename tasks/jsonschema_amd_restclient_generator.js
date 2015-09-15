@@ -85,6 +85,8 @@
                 l,
                 j,
                 o,
+                z,
+                defaults = '',
                 parameters,
                 path_parameters,
                 data,
@@ -109,17 +111,6 @@
                 /* Store current service description. */
                 l = schema.links[i];
 
-                /* Generate method signature. */
-                //parameters = '';
-                ///** @namespace l.schema */
-                ///** @namespace l.schema.properties */
-                //for (j = 0; j < Object.keys(l.schema.properties).length; j += 1) {
-                //    parameters += Object.keys(l.schema.properties)[j];
-                //    if (j < Object.keys(l.schema.properties).length - 1) {
-                //        parameters += ', ';
-                //    }
-                //}
-
                 /* Generate query parameters object. */
                 path_parameters = get_path_parameters(l.href);
                 data = [];
@@ -138,6 +129,25 @@
                 };
                 data_html = data_template(data_dynamic_data);
 
+                /* Collect parameter names for the validation function. */
+                parameters = '';
+                defaults = '';
+                for (z = 0; z < Object.keys(l.schema.properties).length; z += 1) {
+                    parameters += '"' + Object.keys(l.schema.properties)[z] + '"';
+                    if (z < Object.keys(l.schema.properties).length - 1) {
+                        parameters += ', ';
+                    }
+                    /* Look for default values in the definitions section. */
+                    if (l.schema.properties[Object.keys(l.schema.properties)[z]] !== undefined) {
+                        if (schema.definitions[Object.keys(l.schema.properties)[z]].default !== undefined) {
+                            defaults += '"' + Object.keys(l.schema.properties)[z] + '": "' + schema.definitions[Object.keys(l.schema.properties)[z]].default + '",';
+                        }
+                    }
+                }
+
+                /* Remove last comma. */
+                defaults = defaults.substring(0, defaults.length - 1);
+
                 /* Generate the method. */
                 method_dynamic_data = {
                     /** @namespace schema.definitions */
@@ -145,6 +155,7 @@
                     method: '\'' + l.method.toString().toUpperCase() + '\'',
                     rel: l.rel,
                     parameters: parameters,
+                    defaults: defaults,
                     data: data_html,
                     module_name: sanitize_module_name()
                 };
@@ -160,14 +171,13 @@
         /* Plugin entry point. */
         grunt.registerMultiTask('jsonschema_amd_restclient_generator', function () {
 
-            grunt.log.writeln(__dirname);
-
             /* Merge options. */
             var options = this.options({});
 
             /* Make the options global. */
             grunt.option('base_url', options.base_url);
             grunt.option('output_name', options.output_name);
+            grunt.option('output_folder', options.output_folder);
 
             /* Specify the next task to run. */
             grunt.task.run('fetch_json_schema');
@@ -227,7 +237,7 @@
             html = template(dynamic_data);
 
             /* Write the file. */
-            grunt.file.write('dist/' + grunt.option('output_name') + '.js', html, [null, {encoding: 'utf8'}]);
+            grunt.file.write(grunt.option('output_folder') + '/' + grunt.option('output_name') + '.js', html, [null, {encoding: 'utf8'}]);
 
 
             /* Specify the next task to run. */
@@ -238,11 +248,11 @@
         grunt.registerTask('minify_client', 'Generate an AMD client for REST web services described by a JSON Schema.', function () {
             var dist,
                 uglify;
-            dist = 'dist/' + grunt.option('output_name') + '.min.js';
+            dist = grunt.option('output_folder') + '/' + grunt.option('output_name') + '.min.js';
             uglify = {};
             uglify.target = {};
             uglify.target.files = {};
-            uglify.target.files[dist] = ['dist/' + grunt.option('output_name') + '.js'];
+            uglify.target.files[dist] = [grunt.option('output_folder') + '/' +  grunt.option('output_name') + '.js'];
             /** @namespace grunt.initConfig */
             grunt.initConfig({
                 uglify: uglify
