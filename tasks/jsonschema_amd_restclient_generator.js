@@ -86,7 +86,8 @@
                 j,
                 o,
                 z,
-                defaults = '',
+                defaults = [],
+                defaults_string = '',
                 parameters,
                 path_parameters,
                 data,
@@ -95,8 +96,10 @@
                 data_dynamic_data,
                 method_dynamic_data,
                 data_html,
+                data_string = '',
                 methods,
-                Handlebars;
+                Handlebars,
+                ref;
 
             /* Load Handlebars. */
             /*global require*/
@@ -106,6 +109,7 @@
             methods = [];
             method_source = grunt.file.read(__dirname + '/../src/templates/method.hbs', [null, {encoding: 'utf8'}]);
             method_template = Handlebars.compile(method_source);
+
             for (i = 0; i < schema.links.length; i += 1) {
 
                 /* Store current service description. */
@@ -124,14 +128,22 @@
                     encoding: 'utf8'
                 }]);
                 data_template = Handlebars.compile(data_source);
+                data_string = '';
+                for (j = 0; j < data.length; j += 1) {
+                    data_string += '"' + data[j] + '": config.' + data[j];
+                    if (j < data.length - 1) {
+                        data_string += ', ';
+                    }
+                }
                 data_dynamic_data = {
-                    data: data
+                    data: data_string
                 };
                 data_html = data_template(data_dynamic_data);
 
                 /* Collect parameter names for the validation function. */
                 parameters = '';
-                defaults = '';
+                defaults = [];
+                defaults_string = '';
                 for (z = 0; z < Object.keys(l.schema.properties).length; z += 1) {
                     parameters += '"' + Object.keys(l.schema.properties)[z] + '"';
                     if (z < Object.keys(l.schema.properties).length - 1) {
@@ -139,14 +151,23 @@
                     }
                     /* Look for default values in the definitions section. */
                     if (l.schema.properties[Object.keys(l.schema.properties)[z]] !== undefined) {
-                        if (schema.definitions[Object.keys(l.schema.properties)[z]].default !== undefined) {
-                            defaults += '"' + Object.keys(l.schema.properties)[z] + '": "' + schema.definitions[Object.keys(l.schema.properties)[z]].default + '",';
+                        ref = l.schema.properties[Object.keys(l.schema.properties)[z]].$ref;
+                        if (ref !== undefined) {
+                            ref = ref.substring(1 + ref.lastIndexOf('/'));
+                            if (schema.definitions[ref].default !== undefined) {
+                                defaults.push('"' + Object.keys(l.schema.properties)[z] + '": "' + schema.definitions[ref].default + '"');
+                            }
                         }
                     }
                 }
 
-                /* Remove last comma. */
-                defaults = defaults.substring(0, defaults.length - 1);
+                /* Create defaults string. */
+                for (z = 0; z < defaults.length; z += 1) {
+                    defaults_string += defaults[z];
+                    if (z < defaults.length - 1) {
+                        defaults_string += ', ';
+                    }
+                }
 
                 /* Generate the method. */
                 method_dynamic_data = {
@@ -155,7 +176,7 @@
                     method: '\'' + l.method.toString().toUpperCase() + '\'',
                     rel: l.rel,
                     parameters: parameters,
-                    defaults: defaults,
+                    defaults: defaults_string,
                     data: data_html,
                     module_name: sanitize_module_name()
                 };
@@ -238,7 +259,6 @@
 
             /* Write the file. */
             grunt.file.write(grunt.option('output_folder') + '/' + grunt.option('output_name') + '.js', html, [null, {encoding: 'utf8'}]);
-
 
             /* Specify the next task to run. */
             grunt.task.run('minify_client');
