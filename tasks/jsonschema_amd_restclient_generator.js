@@ -86,6 +86,8 @@
                 j,
                 o,
                 z,
+                p,
+                url,
                 defaults = [],
                 defaults_string = '',
                 parameters,
@@ -169,11 +171,21 @@
                     }
                 }
 
+                /* Create URL. */
+                url = l.href;
+                for (z = 0; z < path_parameters.length; z += 1) {
+                    p = "config." + path_parameters[z] + " + '";
+                    url = url.replace("{" + path_parameters[z] + "}", p);
+                    if (z === path_parameters.length - 1) {
+                        url = url + "'";
+                    }
+                }
+                url = url.replace("/config.", "/' + config.");
 
                 /* Generate the method. */
                 method_dynamic_data = {
                     /** @namespace schema.definitions */
-                    path_parameters: path_parameters,
+                    url: url,
                     method: '\'' + l.method.toString().toUpperCase() + '\'',
                     rel: l.rel,
                     parameters: parameters,
@@ -183,6 +195,8 @@
                     q: grunt.option('useQ')
                 };
                 methods.push(method_template(method_dynamic_data));
+
+
 
             }
 
