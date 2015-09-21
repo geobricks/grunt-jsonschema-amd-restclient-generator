@@ -2,7 +2,7 @@
     config = this.apply_{{rel}}_defaults(config);
     if (this.is_valid_{{rel}}(config)) {
         $.ajax({
-            url: {{{url}}},
+            url: this.CONFIG.base_url {{#each path_parameters}} + config.{{this}}{{#unless @last}} + '/' {{/unless}}{{#if @last}} + '/'{{/if}} {{/each}},
             data: {{{data}}},
             type: {{{method}}},
             success: config.success,

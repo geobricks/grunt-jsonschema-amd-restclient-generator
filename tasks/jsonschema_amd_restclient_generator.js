@@ -169,10 +169,12 @@
                     }
                 }
 
+
                 /* Generate the method. */
                 method_dynamic_data = {
                     /** @namespace schema.definitions */
-                    url: '\'' + inject_params(grunt.option('base_url'), l.href, l.schema.properties, schema.definitions) + '\'',
+                    //url: '\'' + inject_params(grunt.option('base_url'), l.href, l.schema.properties, schema.definitions) + '\'',
+                    path_parameters: path_parameters,
                     method: '\'' + l.method.toString().toUpperCase() + '\'',
                     rel: l.rel,
                     parameters: parameters,
