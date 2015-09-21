@@ -3,7 +3,7 @@
     config = this.apply_{{rel}}_defaults(config);
     if (this.is_valid_{{rel}}(config)) {
         return Q($.ajax({
-            url: this.CONFIG.base_url {{#each path_parameters}} + config.{{this}}{{#unless @last}} + '/' {{/unless}}{{#if @last}} + '/'{{/if}} {{/each}},
+            url: this.CONFIG.base_url + '{{rel}}/' {{#each path_parameters}} + config.{{this}}{{#unless @last}} + '/' {{/unless}}{{#if @last}} + '/'{{/if}} {{/each}},
             data: {{{data}}},
             type: {{{method}}}
         }));
