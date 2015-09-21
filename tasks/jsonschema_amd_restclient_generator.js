@@ -173,14 +173,14 @@
                 /* Generate the method. */
                 method_dynamic_data = {
                     /** @namespace schema.definitions */
-                    //url: '\'' + inject_params(grunt.option('base_url'), l.href, l.schema.properties, schema.definitions) + '\'',
                     path_parameters: path_parameters,
                     method: '\'' + l.method.toString().toUpperCase() + '\'',
                     rel: l.rel,
                     parameters: parameters,
                     defaults: defaults_string,
                     data: data_html,
-                    module_name: sanitize_module_name()
+                    module_name: sanitize_module_name(),
+                    q: grunt.option('useQ')
                 };
                 methods.push(method_template(method_dynamic_data));
 
@@ -201,6 +201,7 @@
             grunt.option('base_url', options.base_url);
             grunt.option('output_name', options.output_name);
             grunt.option('output_folder', options.output_folder);
+            grunt.option('useQ', options.useQ);
 
             /* Specify the next task to run. */
             grunt.task.run('fetch_json_schema');
@@ -255,7 +256,8 @@
                 methods: methods,
                 validators: 'validators',
                 module_name: sanitize_module_name,
-                base_url: '\'' + grunt.option('base_url') + '\''
+                base_url: '\'' + grunt.option('base_url') + '\'',
+                q: grunt.option('useQ')
             };
             html = template(dynamic_data);
 

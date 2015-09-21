@@ -1,3 +1,16 @@
+{{#if q}}
+{{module_name}}.prototype.{{rel}} = function(config) {
+    config = this.apply_{{rel}}_defaults(config);
+    if (this.is_valid_{{rel}}(config)) {
+        return Q($.ajax({
+            url: this.CONFIG.base_url {{#each path_parameters}} + config.{{this}}{{#unless @last}} + '/' {{/unless}}{{#if @last}} + '/'{{/if}} {{/each}},
+            data: {{{data}}},
+            type: {{{method}}}
+        }));
+    }
+    throw 400;
+};
+{{else}}
 {{module_name}}.prototype.{{rel}} = function(config) {
     config = this.apply_{{rel}}_defaults(config);
     if (this.is_valid_{{rel}}(config)) {
@@ -10,10 +23,10 @@
             context: config.context,
             always: config.always
         });
-    } else {
-        throw 400;
     }
+    throw 400;
 };
+{{/if}}
 
 {{module_name}}.prototype.is_valid_{{rel}} = function(config) {
     var parameters = [{{{parameters}}}], i;
