@@ -1,5 +1,6 @@
 {{#if q}}
 {{module_name}}.prototype.{{rel}} = function(config) {
+    config = $.extend(true, {}, this.CONFIG, config || {});
     config = this.apply_{{rel}}_defaults(config);
     if (this.is_valid_{{rel}}(config)) {
         return Q($.ajax({
@@ -12,6 +13,7 @@
 };
 {{else}}
 {{module_name}}.prototype.{{rel}} = function(config) {
+    config = $.extend(true, {}, this.CONFIG, config || {});
     config = this.apply_{{rel}}_defaults(config);
     if (this.is_valid_{{rel}}(config)) {
         $.ajax({

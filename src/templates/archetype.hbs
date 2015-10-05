@@ -13,7 +13,7 @@ define(['jquery'{{#if q}}, 'q'{{/if}}], function (${{#if q}}, Q{{/if}}) {
         };
 
         /* Extend default configuration. */
-        this.CONFIG = $.extend(true, {}, this.CONFIG, config);
+        this.CONFIG = $.extend(true, {}, this.CONFIG, config || {});
 
     }
 

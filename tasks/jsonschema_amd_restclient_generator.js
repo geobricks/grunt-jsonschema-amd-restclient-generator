@@ -161,6 +161,10 @@
                             }
                         }
                     }
+                    /* Look for default values in the link definition. */
+                    if (l.schema.properties[Object.keys(l.schema.properties)[z]].default !== undefined) {
+                        defaults.push('"' + Object.keys(l.schema.properties)[z] + '": "' + l.schema.properties[Object.keys(l.schema.properties)[z]].default + '"');
+                    }
                 }
 
                 /* Create defaults string. */
@@ -174,13 +178,15 @@
                 /* Create URL. */
                 url = l.href;
                 for (z = 0; z < path_parameters.length; z += 1) {
-                    p = "config." + path_parameters[z] + " + '";
+                    p = "' + config." + path_parameters[z] + " + '";
                     url = url.replace("{" + path_parameters[z] + "}", p);
                     if (z === path_parameters.length - 1) {
                         url = url + "'";
                     }
                 }
-                url = url.replace("/config.", "/' + config.");
+
+                /* Remove the first characters to have a valid string. */
+                url = url.substring(3);
 
                 /* Generate the method. */
                 method_dynamic_data = {
@@ -210,6 +216,11 @@
 
             /* Merge options. */
             var options = this.options({});
+
+            /* Fix the base URL, if needed. */
+            //if (options.base_url.charAt(options.base_url.length - 1) === '/') {
+            //    options.base_url = options.base_url.substr(0, options.base_url.length - 1);
+            //}
 
             /* Make the options global. */
             grunt.option('base_url', options.base_url);
