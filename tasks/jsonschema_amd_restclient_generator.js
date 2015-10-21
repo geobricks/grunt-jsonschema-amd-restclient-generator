@@ -202,8 +202,6 @@
                 };
                 methods.push(method_template(method_dynamic_data));
 
-
-
             }
 
             /* Return compiled template. */
