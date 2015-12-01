@@ -101,7 +101,9 @@
                 data_string = '',
                 methods,
                 Handlebars,
-                ref;
+                ref,
+                isObject = false,
+                obj_key;
 
             /* Load Handlebars. */
             /*global require*/
@@ -114,6 +116,9 @@
 
             for (i = 0; i < schema.links.length; i += 1) {
 
+                /* Reset flag. */
+                isObject = false;
+
                 /* Store current service description. */
                 l = schema.links[i];
 
@@ -122,6 +127,10 @@
                 data = [];
                 for (j = 0; j < Object.keys(l.schema.properties).length; j += 1) {
                     o = Object.keys(l.schema.properties)[j];
+                    if (l.schema.properties[o].type === 'object') {
+                        isObject = true;
+                        //grunt.log.writeln(l.schema.properties[o].properties.datasource.$ref);
+                    }
                     if (path_parameters.indexOf(Object.keys(l.schema.properties)[j]) < 0) {
                         data.push(o);
                     }
@@ -131,16 +140,43 @@
                 }]);
                 data_template = Handlebars.compile(data_source);
                 data_string = '';
-                for (j = 0; j < data.length; j += 1) {
-                    data_string += '"' + data[j] + '": config.' + data[j];
-                    if (j < data.length - 1) {
-                        data_string += ', ';
+
+                /* Add stringify of the parameter is an object. */
+                if (isObject) {
+                    data_string = '{';
+                    for (j = 0; j < data.length; j += 1) {
+                        //data_string += 'config.' + data[j];
+                        grunt.log.writeln(Object.keys(l.schema.properties[data[j]].properties).length);
+                        for (z = 0; z < Object.keys(l.schema.properties[data[j]].properties).length; z += 1) {
+                            obj_key = Object.keys(l.schema.properties[data[j]].properties)[z];
+                            data_string += '"' + obj_key + '": config.' + obj_key;
+                            if (z < Object.keys(l.schema.properties[data[j]].properties).length - 1) {
+                                data_string += ', ';
+                            }
+                        }
+                        if (j < data.length - 1) {
+                            data_string += ', ';
+                        }
+                    }
+                    data_string += '}';
+                } else {
+                    for (j = 0; j < data.length; j += 1) {
+                        data_string += '"' + data[j] + '": config.' + data[j];
+                        if (j < data.length - 1) {
+                            data_string += ', ';
+                        }
                     }
                 }
                 data_dynamic_data = {
                     data: data_string
                 };
-                data_html = data_template(data_dynamic_data);
+
+                /* Add stringify of the parameter is an object. */
+                if (isObject) {
+                    data_html = data_string;
+                } else {
+                    data_html = data_template(data_dynamic_data);
+                }
 
                 /* Collect parameter names for the validation function. */
                 parameters = '';
@@ -198,7 +234,8 @@
                     defaults: defaults_string,
                     data: data_html,
                     module_name: sanitize_module_name(),
-                    q: grunt.option('useQ')
+                    q: grunt.option('useQ'),
+                    isObject: isObject
                 };
                 methods.push(method_template(method_dynamic_data));
 

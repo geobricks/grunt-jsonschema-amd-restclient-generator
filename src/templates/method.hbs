@@ -6,14 +6,26 @@
             return Q($.ajax({
                 url: this.CONFIG.base_url + {{{url}}},
                 traditional: true,
-                data: {{{data}}},
+                {{#if isObject}}
+                    data: JSON.stringify({{{data}}}),
+                    contentType: "application/json",
+                    dataType : "json",
+                {{else}}
+                    data: {{{data}}},
+                {{/if}}
                 type: {{{method}}}
             }));
         {{else}}
             $.ajax({
                 url: this.CONFIG.base_url + {{{url}}},
                 traditional: true,
-                data: {{{data}}},
+                {{#if isObject}}
+                    data: JSON.stringify({{{data}}}),
+                    contentType: "application/json",
+                    dataType : "json",
+                {{else}}
+                    data: {{{data}}},
+                {{/if}}
                 type: {{{method}}},
                 success: config.success,
                 error: config.error,
@@ -25,15 +37,21 @@
     throw 400;
 };
 
-{{module_name}}.prototype.is_valid_{{rel}} = function(config) {
-    var parameters = [{{{parameters}}}], i;
-    for (i = 0; i < parameters.length; i += 1) {
-        if (config[parameters[i]] === undefined) {
-            throw 'Parameter "' + parameters[i] + '" is undefined. Please check your request.';
+{{#if isObject}}
+    {{module_name}}.prototype.is_valid_{{rel}} = function(config) {
+        return true;
+    };
+{{else}}
+    {{module_name}}.prototype.is_valid_{{rel}} = function(config) {
+        var parameters = [{{{parameters}}}], i;
+        for (i = 0; i < parameters.length; i += 1) {
+            if (config[parameters[i]] === undefined) {
+                throw 'Parameter "' + parameters[i] + '" is undefined. Please check your request.';
+            }
         }
-    }
-    return true;
-};
+        return true;
+    };
+{{/if}}
 
 {{module_name}}.prototype.apply_{{rel}}_defaults = function (config) {
     var i,
