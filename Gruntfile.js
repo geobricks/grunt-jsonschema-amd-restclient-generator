@@ -20,10 +20,11 @@
             jsonschema_amd_restclient_generator: {
                 custom_options: {
                     options: {
-                        base_url: 'http://fenixapps2.fao.org/api/v1.0/',
+                        base_url: 'http://localhost:8081/api/v1.0/',
                         output_name: 'RESTClient',
                         output_folder: 'src/js',
-                        useQ: true
+                        useQ: true,
+                        useCache: true
                     }
                 }
             }

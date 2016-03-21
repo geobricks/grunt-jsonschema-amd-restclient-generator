@@ -235,6 +235,7 @@
                     data: data_html,
                     module_name: sanitize_module_name(),
                     q: grunt.option('useQ'),
+                    cache: grunt.option('useCache'),
                     isObject: isObject
                 };
                 methods.push(method_template(method_dynamic_data));
@@ -262,6 +263,7 @@
             grunt.option('output_name', options.output_name);
             grunt.option('output_folder', options.output_folder);
             grunt.option('useQ', options.useQ);
+            grunt.option('useCache', options.useCache);
 
             /* Specify the next task to run. */
             grunt.task.run('fetch_json_schema');
@@ -317,7 +319,8 @@
                 validators: 'validators',
                 module_name: sanitize_module_name,
                 base_url: '\'' + grunt.option('base_url') + '\'',
-                q: grunt.option('useQ')
+                q: grunt.option('useQ'),
+                cache: grunt.option('useCache')
             };
             html = template(dynamic_data);
 

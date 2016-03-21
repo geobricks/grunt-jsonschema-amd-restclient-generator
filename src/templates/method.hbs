@@ -2,19 +2,48 @@
     config = $.extend(true, {}, this.CONFIG, config || {});
     config = this.apply_{{rel}}_defaults(config);
     if (this.is_valid_{{rel}}(config)) {
+        var url = this.CONFIG.base_url + {{{url}}},
+            data = {{{data}}};
+
+        var key = JSON.stringify($.extend({url: url}, data));
+        var v = amplify.store.sessionStorage(key);
+
         {{#if q}}
-            return Q($.ajax({
-                url: this.CONFIG.base_url + {{{url}}},
-                traditional: true,
-                {{#if isObject}}
-                    data: JSON.stringify({{{data}}}),
-                    contentType: "application/json",
-                    dataType : "json",
-                {{else}}
-                    data: {{{data}}},
-                {{/if}}
-                type: {{{method}}}
-            }));
+            if ( v === undefined) {
+                return Q($.ajax({
+                    url: url,
+                    /*
+                        <!-- TODO: this should be an option in the schema -->
+                    */
+                    traditional: true,
+                    {{#if isObject}}
+                        data: JSON.stringify({{{data}}}),
+                        contentType: "application/json",
+                        /*
+                            dataType : "json"
+                        */
+                    {{else}}
+                        data: data,
+                    {{/if}}
+                    type: {{{method}}}
+                })).then(function (d) {
+                    <!-- TODO: this should be at the schema level for each request and not a global one -->
+                    {{#if cache}}
+                    try {
+                        amplify.store.sessionStorage(key, d);
+                    }catch(e) {
+                       /*
+                            <!-- catching for quota exceed-->
+                            <!--console.error(e);-->
+                        */
+                    }
+                    {{/if}}
+                    return d;
+                });
+            }else {
+                return Q.when(v);
+            }
+
         {{else}}
             $.ajax({
                 url: this.CONFIG.base_url + {{{url}}},
@@ -22,7 +51,10 @@
                 {{#if isObject}}
                     data: JSON.stringify({{{data}}}),
                     contentType: "application/json",
-                    dataType : "json",
+                    /*
+                        <!-- should not the forced the dataType, i.e. when there is csv could bring some error -->
+                        dataType : "json",
+                    */
                 {{else}}
                     data: {{{data}}},
                 {{/if}}
