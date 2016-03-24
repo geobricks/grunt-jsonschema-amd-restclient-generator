@@ -320,9 +320,7 @@
             /* rewrite the final base_url if final_base_url exists otherwise use the base_url */
             base_url = grunt.option('final_base_url') || grunt.option('base_url');
 
-            grunt.log.writeln("BASE URL");
-            grunt.log.writeln(base_url);
-            grunt.log.writeln(grunt.option('final_base_url'));
+            grunt.log.writeln("base URL that will be used", base_url);
 
             dynamic_data = {
                 methods: methods,
