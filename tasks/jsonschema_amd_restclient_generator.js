@@ -264,6 +264,7 @@
             grunt.option('output_folder', options.output_folder);
             grunt.option('useQ', options.useQ);
             grunt.option('useCache', options.useCache);
+            grunt.option('final_base_url', options.final_base_url);
 
             /* Specify the next task to run. */
             grunt.task.run('fetch_json_schema');
@@ -297,6 +298,7 @@
                 source,
                 template,
                 dynamic_data,
+                base_url,
                 html;
 
             /* Load Handlebars. */
@@ -314,11 +316,19 @@
                 encoding: 'utf8'
             }]);
             template = Handlebars.compile(source);
+            
+            /* rewrite the final base_url if final_base_url exists otherwise use the base_url */
+            base_url = grunt.option('final_base_url') || grunt.option('base_url');
+
+            grunt.log.writeln("BASE URL");
+            grunt.log.writeln(base_url);
+            grunt.log.writeln(grunt.option('final_base_url'));
+
             dynamic_data = {
                 methods: methods,
                 validators: 'validators',
                 module_name: sanitize_module_name,
-                base_url: '\'' + grunt.option('base_url') + '\'',
+                base_url: '\'' + base_url + '\'',
                 q: grunt.option('useQ'),
                 cache: grunt.option('useCache')
             };
