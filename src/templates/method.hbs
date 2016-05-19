@@ -3,10 +3,11 @@
     config = this.apply_{{rel}}_defaults(config);
     if (this.is_valid_{{rel}}(config)) {
         var url = this.CONFIG.base_url + {{{url}}},
-            data = {{{data}}};
+            data = {{{data}}},
+            self = this;
 
         var key = JSON.stringify($.extend({url: url}, data));
-        var v = amplify.store.sessionStorage(key);
+        var v = this.store(key);
 
         {{#if q}}
             if ( v === undefined) {
@@ -30,11 +31,11 @@
                     <!-- TODO: this should be at the schema level for each request and not a global one -->
                     {{#if cache}}
                     try {
-                        amplify.store.sessionStorage(key, d);
+                        self.store(key, d);
                     }catch(e) {
                        /*
-                            <!-- catching for quota exceed-->
-                            <!--console.error(e);-->
+                         // catching for quota exceed
+                         console.error(e);
                         */
                     }
                     {{/if}}
@@ -85,7 +86,7 @@
     };
 {{/if}}
 
-{{module_name}}.prototype.apply_{{rel}}_defaults = function (config) {
+{{module_name}}.prototype.apply_{{rel}}_defaults = function(config) {
     var i,
         parameters = [{{{parameters}}}],
         defaults = {

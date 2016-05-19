@@ -1,5 +1,5 @@
 /*global define, Q, amplify*/
-define(['jquery'{{#if q}}, 'q'{{/if}} {{#if cache}}, 'amplify'{{/if}}], function (${{#if q}}, Q{{/if}}) {
+define(['jquery'{{#if q}}, 'loglevel', 'q'{{/if}} {{#if cache}}, 'amplify'{{/if}}], function ($, log{{#if q}}, Q{{/if}}) {
 
     'use strict';
 
@@ -8,6 +8,7 @@ define(['jquery'{{#if q}}, 'q'{{/if}} {{#if cache}}, 'amplify'{{/if}}], function
         /* Store configuration. */
         this.CONFIG = {
             base_url: {{{base_url}}}
+            //base_url: '@@url_api'
         };
 
         /* Extend default configuration. */
@@ -18,6 +19,26 @@ define(['jquery'{{#if q}}, 'q'{{/if}} {{#if cache}}, 'amplify'{{/if}}], function
     {{#each methods}}
         {{{this}}}
     {{/each}}
+
+    /* used to get a key/value */
+    {{module_name}}.prototype.store = function(key, value) {
+
+        var expireStoreTime = 300000;
+        // 300000 (5 minutes)
+        // 600000 (10 minutes)
+        // 1200000 (20 minutes)
+        // 1800000 (30 minutes)
+        // 3600000 (60 minutes)
+
+        if (value !== undefined) {
+            log.info("Stored", key);
+            return amplify.store(key, value, expireStoreTime);
+        }else {
+            log.info("Get Stored", key);
+            return amplify.store(key);
+        }
+
+    };
 
     return {{module_name}};
 
