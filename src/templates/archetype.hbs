@@ -7,8 +7,9 @@ define(['jquery'{{#if q}}, 'loglevel', 'q'{{/if}} {{#if cache}}, 'amplify'{{/if}
 
         /* Store configuration. */
         this.CONFIG = {
-            base_url: {{{base_url}}}
-            //base_url: '@@url_api'
+            base_url: {{{base_url}}},
+            //base_url: '@@url_api',
+            mode: '@@mode'
         };
 
         /* Extend default configuration. */
@@ -22,6 +23,11 @@ define(['jquery'{{#if q}}, 'loglevel', 'q'{{/if}} {{#if cache}}, 'amplify'{{/if}
 
     /* used to get a key/value */
     {{module_name}}.prototype.store = function(key, value) {
+
+        /* if mode = 'dev' */
+        if(this.CONFIG.hasOwnProperty('mode') && this.CONFIG.mode == 'dev') {
+            return undefined;
+        }
 
         var expireStoreTime = 300000;
         // 300000 (5 minutes)
