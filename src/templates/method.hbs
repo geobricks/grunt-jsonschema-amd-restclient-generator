@@ -13,30 +13,22 @@
             if ( v === undefined) {
                 return Q($.ajax({
                     url: url,
-                    /*
-                        <!-- TODO: this should be an option in the schema -->
-                    */
+                    // TODO: this should be an option in the schema
                     traditional: true,
                     {{#if isObject}}
-                        data: JSON.stringify({{{data}}}),
+                        data: JSON.stringify(data),
                         contentType: "application/json",
-                        /*
-                            dataType : "json"
-                        */
                     {{else}}
                         data: data,
                     {{/if}}
                     type: {{{method}}}
                 })).then(function (d) {
-                    <!-- TODO: this should be at the schema level for each request and not a global one -->
+                    // TODO: this should be at the schema level for each request and not a global one
                     {{#if cache}}
                     try {
                         self.store(key, d);
                     }catch(e) {
-                       /*
-                         // catching for quota exceed
-                         console.error(e);
-                        */
+                        // catching for quota exceed
                     }
                     {{/if}}
                     return d;
@@ -50,14 +42,12 @@
                 url: this.CONFIG.base_url + {{{url}}},
                 traditional: true,
                 {{#if isObject}}
-                    data: JSON.stringify({{{data}}}),
+                    data: JSON.stringify(data),
                     contentType: "application/json",
-                    /*
-                        <!-- should not the forced the dataType, i.e. when there is csv could bring some error -->
-                        dataType : "json",
-                    */
+                    // should not the forced the dataType, i.e. when there is csv could bring some error
+                    // dataType : "json",
                 {{else}}
-                    data: {{{data}}},
+                    data: data,
                 {{/if}}
                 type: {{{method}}},
                 success: config.success,
@@ -103,7 +93,7 @@
         try {
             config[key] = config[key] !== undefined ? config[key] : defaults[key];
         } catch (ignore) {
-            /* No default value available for this parameter. */
+            // No default value available for this parameter.
         }
     }
     return config;

@@ -25,7 +25,7 @@ define(['jquery'{{#if q}}, 'loglevel', 'q'{{/if}} {{#if cache}}, 'amplify'{{/if}
     {{module_name}}.prototype.store = function(key, value) {
 
         /* if mode = 'dev' */
-        if(this.CONFIG.hasOwnProperty('mode') && this.CONFIG.mode == 'dev') {
+        if(this.CONFIG.hasOwnProperty('mode') && this.CONFIG.mode === 'dev') {
             return undefined;
         }
 
