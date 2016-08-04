@@ -1,9 +1,9 @@
-{{module_name}}.prototype.{{rel}} = function(config) {
-    config = $.extend(true, {}, this.CONFIG, config || {});
+{{module_name}}.prototype.{{rel}} = function(confic) {
+    var config = $.extend(true, {}, this.CONFIG, confic || {});
     config = this.apply_{{rel}}_defaults(config);
-    if (this.is_valid_{{rel}}(config)) {
+    if (this.is_valid_{{rel}}(c)) {
         var url = this.CONFIG.base_url + {{{url}}},
-            data = {{{data}}},
+            data =  {{{data}}},
             self = this;
 
         var key = JSON.stringify($.extend({url: url}, data));
