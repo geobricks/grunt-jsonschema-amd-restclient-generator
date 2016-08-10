@@ -1,7 +1,7 @@
-{{module_name}}.prototype.{{rel}} = function(confic) {
-    var config = $.extend(true, {}, this.CONFIG, confic || {});
+{{module_name}}.prototype.{{rel}} = function(c) {
+    var config = $.extend(true, {}, this.CONFIG, c || {});
     config = this.apply_{{rel}}_defaults(config);
-    if (this.is_valid_{{rel}}(c)) {
+    if (this.is_valid_{{rel}}(config)) {
         var url = this.CONFIG.base_url + {{{url}}},
             data =  {{{data}}},
             self = this;
