@@ -3,19 +3,23 @@ define(['jquery'{{#if q}}, 'loglevel', 'q'{{/if}} {{#if cache}}, 'amplify'{{/if}
 
     'use strict';
 
-    function {{module_name}}(config) {
+    function {{module_name}}() {
+
+    };
+
+    {{module_name}}.prototype.config = function(c) {
 
         /* Store configuration. */
         this.CONFIG = {
             base_url: {{{base_url}}},
-            //base_url: '@@url_api',
-            mode: '@@mode'
+            mode: '@@mode',
+            lang: 'en'
         };
 
         /* Extend default configuration. */
-        this.CONFIG = $.extend(true, {}, this.CONFIG, config || {});
+        this.CONFIG = $.extend(true, {}, this.CONFIG, c || {});
 
-    }
+    };
 
     {{#each methods}}
         {{{this}}}
@@ -46,6 +50,6 @@ define(['jquery'{{#if q}}, 'loglevel', 'q'{{/if}} {{#if cache}}, 'amplify'{{/if}
 
     };
 
-    return {{module_name}};
+    return new {{module_name}};
 
 });
