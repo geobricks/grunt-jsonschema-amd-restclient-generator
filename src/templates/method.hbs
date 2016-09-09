@@ -3,8 +3,15 @@
     config = this.apply_{{rel}}_defaults(config);
     if (this.is_valid_{{rel}}(config)) {
         var url = this.CONFIG.base_url + {{{url}}},
-            data =  {{{data}}},
+            url_data = [{{{url_data}}}],
             self = this;
+
+        // if advanced
+        var data = $.extend(true, {}, c, {{{data}}});
+
+        for(var s in url_data) {
+            delete data[s];
+        }
 
         var key = JSON.stringify($.extend({url: url}, data));
         var v = this.store(key);

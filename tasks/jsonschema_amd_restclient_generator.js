@@ -88,6 +88,7 @@
                 z,
                 p,
                 url,
+                url_data = [],
                 defaults = [],
                 defaults_string = '',
                 parameters,
@@ -213,9 +214,15 @@
 
                 /* Create URL. */
                 url = l.href;
+                url_data = [];
                 for (z = 0; z < path_parameters.length; z += 1) {
                     p = "' + config." + path_parameters[z] + " + '";
-                    url = url.replace("{" + path_parameters[z] + "}", p);
+                    if(url.indexOf("{" + path_parameters[z] + "}") >= 0) {
+                        url = url.replace("{" + path_parameters[z] + "}", p);
+                        if (url_data.indexOf("'" + path_parameters[z] + "'") < 0) {
+                            url_data.push("'" + path_parameters[z] + "'");
+                        }
+                    }
                     if (z === path_parameters.length - 1) {
                         url = url + "'";
                     }
@@ -228,6 +235,7 @@
                 method_dynamic_data = {
                     /** @namespace schema.definitions */
                     url: url,
+                    url_data: url_data,
                     method: '\'' + l.method.toString().toUpperCase() + '\'',
                     rel: l.rel,
                     parameters: parameters,
