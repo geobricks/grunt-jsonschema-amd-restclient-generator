@@ -28,7 +28,7 @@
                        // final_base_url: 'http://fenixservices.fao.org/faostat/api/v1/',
                         final_base_url: 'http://fenixervices.fao.org/faostat/api/v1/',
 
-                        output_name: 'RESTClient',
+                        output_name: 'FAOSTATAPIClient',
                         output_folder: 'src/js',
                         useQ: true,
                         useCache: true,

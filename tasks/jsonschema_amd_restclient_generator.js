@@ -92,6 +92,7 @@
                 defaults = [],
                 defaults_string = '',
                 parameters,
+                parameters_required,
                 path_parameters,
                 data,
                 data_source,
@@ -104,6 +105,8 @@
                 Handlebars,
                 ref,
                 isObject = false,
+                compressArray = false,
+                traditional = true,
                 obj_key;
 
             /* Load Handlebars. */
@@ -147,7 +150,6 @@
                     data_string = '{';
                     for (j = 0; j < data.length; j += 1) {
                         //data_string += 'config.' + data[j];
-                        grunt.log.writeln(Object.keys(l.schema.properties[data[j]].properties).length);
                         for (z = 0; z < Object.keys(l.schema.properties[data[j]].properties).length; z += 1) {
                             obj_key = Object.keys(l.schema.properties[data[j]].properties)[z];
                             data_string += '"' + obj_key + '": config.' + obj_key;
@@ -214,7 +216,7 @@
 
                 /* Create URL. */
                 url = l.href;
-                url_data = [];
+                url_data = ["'base_url'"];
                 for (z = 0; z < path_parameters.length; z += 1) {
                     p = "' + config." + path_parameters[z] + " + '";
                     if(url.indexOf("{" + path_parameters[z] + "}") >= 0) {
@@ -231,6 +233,23 @@
                 /* Remove the first characters to have a valid string. */
                 url = url.substring(3);
 
+                /* parameters required */
+                parameters_required = l.schema.required;
+
+                if ( parameters_required !== undefined) {
+                    parameters_required = parameters_required.map(function(p){
+                        // Wrap each parameter with quotes
+                        return "'" + p + "'";
+                    }).join(","); // Put a comma in between every element
+                }else{
+                    // add as default all paramters to be required
+                    parameters_required = parameters;
+                }
+
+                /* parse arrays variable */
+                compressArray = l.compressArray || compressArray;
+                traditional = l.traditional || traditional;
+
                 /* Generate the method. */
                 method_dynamic_data = {
                     /** @namespace schema.definitions */
@@ -239,12 +258,15 @@
                     method: '\'' + l.method.toString().toUpperCase() + '\'',
                     rel: l.rel,
                     parameters: parameters,
+                    parameters_required: parameters_required,
                     defaults: defaults_string,
                     data: data_html,
                     module_name: sanitize_module_name(),
                     q: grunt.option('useQ'),
                     cache: grunt.option('useCache'),
-                    isObject: isObject
+                    isObject: isObject,
+                    compressArray: compressArray,
+                    traditional: traditional
                 };
                 methods.push(method_template(method_dynamic_data));
 
