@@ -147,7 +147,6 @@
                     data_string = '{';
                     for (j = 0; j < data.length; j += 1) {
                         //data_string += 'config.' + data[j];
-                        grunt.log.writeln(Object.keys(l.schema.properties[data[j]].properties).length);
                         for (z = 0; z < Object.keys(l.schema.properties[data[j]].properties).length; z += 1) {
                             obj_key = Object.keys(l.schema.properties[data[j]].properties)[z];
                             data_string += '"' + obj_key + '": config.' + obj_key;
