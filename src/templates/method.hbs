@@ -4,13 +4,25 @@
     if (this.is_valid_{{rel}}(config)) {
         var url = this.CONFIG.base_url + {{{url}}},
             url_data = [{{{url_data}}}],
+            compressArray = {{compressArray}},
+            traditional = {{traditional}},
             self = this;
 
         // if advanced
         var data = $.extend(true, {}, c, {{{data}}});
 
-        for(var s in url_data) {
-            delete data[s];
+        for(var i=0; i < url_data.length; i++) {
+            delete data[url_data[i]];
+        }
+
+        // parse arrays to strings
+        // this will reduce the length of the URL
+        if(compressArray === true) {
+            $.each(data, function(k, v) {
+                if (Array.isArray(v)) {
+                    data[k] = v.join(",");
+                }
+            });
         }
 
         var key = JSON.stringify($.extend({url: url}, data));
@@ -21,7 +33,7 @@
                 return Q($.ajax({
                     url: url,
                     // TODO: this should be an option in the schema
-                    traditional: true,
+                    traditional: traditional,
                     {{#if isObject}}
                         data: JSON.stringify(data),
                         contentType: "application/json",
@@ -47,7 +59,7 @@
         {{else}}
             $.ajax({
                 url: this.CONFIG.base_url + {{{url}}},
-                traditional: true,
+                traditional: traditional,
                 {{#if isObject}}
                     data: JSON.stringify(data),
                     contentType: "application/json",
@@ -73,7 +85,7 @@
     };
 {{else}}
     {{module_name}}.prototype.is_valid_{{rel}} = function(config) {
-        var parameters = [{{{parameters}}}], i;
+        var parameters = [{{{parameters_required}}}], i;
         for (i = 0; i < parameters.length; i += 1) {
             if (config[parameters[i]] === undefined) {
                 throw 'Parameter "' + parameters[i] + '" is undefined. Please check your request.';
