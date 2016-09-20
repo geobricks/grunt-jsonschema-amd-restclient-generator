@@ -5,17 +5,17 @@ define(['jquery'{{#if q}}, 'loglevel', 'q'{{/if}} {{#if cache}}, 'amplify'{{/if}
 
     function {{module_name}}() {
 
+        /* Store configuration. */
+            this.CONFIG = {
+                base_url: {{{base_url}}},
+                mode: '@@mode',
+                lang: 'en',
+                log: false
+            };
+
     };
 
     {{module_name}}.prototype.config = function(c) {
-
-        /* Store configuration. */
-        this.CONFIG = {
-            base_url: {{{base_url}}},
-            mode: '@@mode',
-            lang: 'en',
-            log: false
-        };
 
         /* Extend default configuration. */
         this.CONFIG = $.extend(true, {}, this.CONFIG, c || {});

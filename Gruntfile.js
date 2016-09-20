@@ -26,7 +26,7 @@
                         /* if not set will be used base_url as end point */
                         /* TODO: should be in the schema? */
                        // final_base_url: 'http://fenixservices.fao.org/faostat/api/v1/',
-                        final_base_url: 'http://fenixervices.fao.org/faostat/api/v1/',
+                        final_base_url: 'http://fenixservices.fao.org/faostat/api/v1/',
 
                         output_name: 'FAOSTATAPIClient',
                         output_folder: 'src/js',
