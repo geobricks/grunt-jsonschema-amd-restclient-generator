@@ -25,6 +25,10 @@
             });
         }
 
+        if (this.CONFIG.log) {
+            log.info("API.{{rel}}; request", data);
+        }
+
         var key = JSON.stringify($.extend({url: url}, data));
         var v = this.store(key);
 
@@ -88,8 +92,12 @@
         var parameters = [{{{parameters_required}}}], i;
         for (i = 0; i < parameters.length; i += 1) {
             if (config[parameters[i]] === undefined) {
+                log.error('Parameter "' + parameters[i] + '" is undefined. Please check your request.');
                 throw 'Parameter "' + parameters[i] + '" is undefined. Please check your request.';
             }
+        }
+        if (this.CONFIG.log) {
+            log.info("API.prototype.is_valid_{{rel}}", true);
         }
         return true;
     };
@@ -115,5 +123,10 @@
             // No default value available for this parameter.
         }
     }
+
+    if (this.CONFIG.log) {
+        log.info("API.prototype.apply_{{rel}}", defaults, parameters, config);
+    }
+
     return config;
 };
